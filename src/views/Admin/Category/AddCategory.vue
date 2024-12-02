@@ -1,0 +1,67 @@
+<script setup>
+import { ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+const router = useRouter()
+let url = 'http://localhost/vuejs-server/api.php/categories'
+const name = ref("")
+const description = ref("")
+const handleSubmit = async () => {
+    checkValidate()
+    if (nameError.value == '' && descriptionError.value == '' ) {
+        let formData = new FormData()
+        formData.append('name', name.value)
+        formData.append('description', description.value);
+
+        let respone = await axios.post(url, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        })
+        if (respone) {
+            alert(respone.data.message)
+            router.push('/admin/category')
+        }
+    }
+}
+
+const nameError = ref("")
+const descriptionError = ref("")
+// const statusError = ref(false)
+
+const checkValidate = async () => {
+    if (name.value == '') {
+        nameError.value = 'Tên danh mục không được để trống'
+    } else {
+        nameError.value = '';
+    }
+    if (description.value == '') {
+        descriptionError.value = 'Mô tả danh mục không được để trống'
+        // statusError.value = true
+    } else {
+        descriptionError.value = '';
+
+    }
+
+}
+</script>
+<template>
+    <div class="p-4" style="min-height: 800px;">
+        <h1>Trang thêm danh mục</h1>
+        <form @submit.prevent="handleSubmit">
+            <div class="mb-3">
+                <label for="name">Name</label>
+                <input type="text" id="name" class="form-control" placeholder="Tên danh mục" v-model="name">
+                <span class="text-danger" v-if="nameError !== ''">{{ nameError }}</span>
+            </div>
+            <div class="mb-3">
+                <label for="name">Description</label>
+                <input type="text" id="description" class="form-control" placeholder="Mô tả danh mục"
+                    v-model="description">
+                <span class="text-danger" v-if="descriptionError !== ''">{{ descriptionError }}</span>
+
+            </div>
+            <button class="btn btn-success">Thêm mới</button>
+        </form>
+    </div>
+</template>
